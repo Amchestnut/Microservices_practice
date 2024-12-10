@@ -14,12 +14,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/patient")   // prefiks za putanje
-@AllArgsConstructor     // umesto AutoWired, ili umesto Setter / Getter
+//@AllArgsConstructor     // umesto AutoWired, ili umesto Setter / Getter
 public class PatientController {
 
     // znaci FRONT i controller logika: Trazio si mi pacijenta, ja cu da ti gettujem pacijenta.
 
     private PatientService patientService;
+
+    public PatientController(PatientService patientService) {
+        this.patientService = patientService;
+    }
 
     @GetMapping     // za GET
     public ResponseEntity<List<PatientDTO>> getAll(){

@@ -15,8 +15,10 @@ public class AppRunner {
     private PatientRepository patientRepository;
 
     // Constructor injection without Lombok
-    public AppRunner(DoctorRepository doctorRepository) {
+    // ALL ARGS CONSTRUCTOR
+    public AppRunner(DoctorRepository doctorRepository, PatientRepository patientRepository) {
         this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Bean

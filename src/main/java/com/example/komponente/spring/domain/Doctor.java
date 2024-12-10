@@ -11,10 +11,10 @@ import java.util.List;
 @Entity
 //@Table(name = "doctors")      NE MOZE OVO DA SE STAVI AKO IMAM SINGLE_TABLE !!! STRATEGIJA
 @DiscriminatorValue("DOCTOR")   // ono po cemu se razlikuje, diskriminator za SINGLE_TABLE
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
+//@Getter
+//@Setter
 public class Doctor extends Person{
     private String specialization;
 
@@ -25,9 +25,39 @@ public class Doctor extends Person{
     private List<Patient> patients;     // ovu listu patients mapiraj sa listom doctors, u PATIENT
 
 
+    public Doctor() {
+    }
+
+    public Doctor(String firstName, String lastName, String contactNumber, Address address, Status status, String specialization, List<Patient> patients) {
+        super(firstName, lastName, contactNumber, address, status);
+        this.specialization = specialization;
+        this.patients = patients;
+    }
+
+    public Doctor(String specialization, List<Patient> patients) {
+        this.specialization = specialization;
+        this.patients = patients;
+    }
+
     public Doctor(String firstName, String lastName, String contactNumber, Address address, Status status, String specialization) {
         super(firstName, lastName, contactNumber, address, status);
         this.specialization = specialization;
     }
 
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public List<Patient> getPatients() {
+        return patients;
+    }
+
+    public void setPatients(List<Patient> patients) {
+        this.patients = patients;
+    }
 }

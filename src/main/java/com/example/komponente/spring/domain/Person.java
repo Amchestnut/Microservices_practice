@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity     // When I run the program, in Database I will have a TABLE called person !!!
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 // da nisam dodao ovaj naziv tabele @Table, naziv tabele bi bio samo "person" malim slovima. Dobro zbog raznih OS (mac, windows)
 @Table(name = "person_table")     // Ovde zadajem kako ce da se ZOVE OVA TABELA, ako je budem pravio
 
@@ -36,4 +36,65 @@ public abstract class Person extends BaseEntity {
 //        this.address = address;
 //        this.status = status;
 //    }
+
+
+    public Person() {
+    }
+
+    public Person(String firstName, String lastName, String contactNumber, Address address, Status status) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.contactNumber = contactNumber;
+        this.address = address;
+        this.status = status;
+    }
+
+    public Person(Long id, boolean deleted, boolean active, String firstName, String lastName, String contactNumber, Address address, Status status) {
+        super(id, deleted, active);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.contactNumber = contactNumber;
+        this.address = address;
+        this.status = status;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

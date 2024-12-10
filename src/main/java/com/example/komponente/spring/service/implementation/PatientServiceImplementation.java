@@ -13,11 +13,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service    // spring ce da se brine o njemu
-@AllArgsConstructor     /// posto o patient repository BRINE SPRING, mi moramo ovom ovde da damo all args construktor
+//@AllArgsConstructor     /// posto o patient repository BRINE SPRING, mi moramo ovom ovde da damo all args construktor
 public class PatientServiceImplementation implements PatientService {
     // kako ce servis da dobije listu pacijenata? pa repository
     private PatientRepository patientRepository;
     private PatientMapper patientMapper;
+
+    public PatientServiceImplementation(PatientRepository patientRepository, PatientMapper patientMapper) {
+        this.patientRepository = patientRepository;
+        this.patientMapper = patientMapper;
+    }
 
     @Override
     public List<PatientDTO> findAll() {

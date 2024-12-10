@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Getter
+//@Setter
 // neki pregled servis, gde imamo pristup istorijama bolesti, pregledima, istorijom pregleda, i dodatna polja za lekove
 public class Medication extends BaseEntity{
     private String name;

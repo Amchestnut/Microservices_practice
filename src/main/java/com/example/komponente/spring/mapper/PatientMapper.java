@@ -10,7 +10,7 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+//@AllArgsConstructor
 public class PatientMapper {
 
     public PatientDTO getDtoFromDomain(Patient patient){
@@ -21,4 +21,8 @@ public class PatientMapper {
 
         return patientDTO;
     }
+
+    public PatientMapper() {
+    }
+
 }

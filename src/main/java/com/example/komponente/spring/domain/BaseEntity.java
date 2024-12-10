@@ -11,10 +11,6 @@ import lombok.Setter;
 
 // od ove klase NECU NAPRAVITI TABELU, ali svuda gde je posle iskoristim, gde je NASLEDJUJU, imace u njoj definisana polja.
 @MappedSuperclass
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 
 public class BaseEntity {
     // ovo je nesto sto svaka TABELA IMA, koja je bude nasledila !!!
@@ -25,4 +21,37 @@ public class BaseEntity {
     private boolean active;  // da li je aktiviran user, ono sa EMAIl
     // imaj i nesto da pamti - kad je kreiran !!
 
+
+    public BaseEntity() {
+    }
+
+    public BaseEntity(Long id, boolean deleted, boolean active) {
+        this.id = id;
+        this.deleted = deleted;
+        this.active = active;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }
