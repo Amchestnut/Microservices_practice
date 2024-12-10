@@ -1,0 +1,153 @@
+h2 baza je baza koja je temporary, postoji samo tokom izvrsavanja. Kad nisam siguran koju cu bazu koristiti u buducnosti, uzmem i koristim ovu.
+
+JPA- java persintent API, svi SQL upiti su mi isti, jer koristim instance, a ne pisem rucno SQL upite
+
+Klijentski deo - FRONTEND
+
+Servis - BACKEND, ono sto se nalazi u pozadini, komuniciraju sa bazom.
+
+Biznis logika - dohvatanje iz baze, radjenje sa bazom i vracanje podataka klijentu...
+
+-----
+
+Application CONTEXT - u ovom projektu, imacu razne klase, a ja nigde u mom kodu se necu baviti pravljenjem objekata tih nekih klasa, nego ce to za nas raditi spring.
+
+Da bi se podigao taj CONTEXT, prvo se u taj neki PROSTOR smestaju svi objekti koji su se izgenerisali.
+(postoji vise nacina da se ti objekti generisu, kao npr: Singletoni, pa onda mozemo imati da se negde objekti kreiraju svaki put kada pozovemo klasu,
+i mozemo i mi da oznacimo neke klase da necemo da se mi da se brinemo o njenim objektima, nego cemo da ih oznacimo sa ''''@BEAN @REPOSITORY @SERVIS @COMPONENT''''
+To su klase cije objekte ce za nas objekte da napravi SPRING, ja mogu samo da ih dohvatam u mom kodu i da ih ubacujem pomocu ''DEPENDENCY INJECTION''
+
+Znaci njihove objekte ce da napravi spring, i da se brine o celom njihovom zivotnom veku
+Mislim da je @SERVIS - singleton
+
+Kao neki kontejner za objekte/instance klasa koji smo napravili i gde ce SPRING da se brine da ih napravi, a mi cemo samo da ih dohvatamo pomocu dependency injectiona
+
+------
+
+Prvi deo koji sad radimo je MODEL nase aplikacije.
+Model je "domain"
+Zasto zovemo domain? Zato sto je ovde model podataka sa kojima radimo vezan za:
+ - bazu (1. deo: DOMENSKI OBJEKTI)
+ - podatke koje prikazujemo korisnicima (2. deo: DTO OBJEKTI)
+
+DTO - data transfer object
+DTO - jako bitna stvar za prikazivanje podataka korisniku na frontu! to je cela sustina, seti se primera sa INSTAGRAMOM (jefimija)
+
+
+-----
+
+SOFT DELETE - koristan jer se zapravo nista ne brise. Samo stavimo neki label, E OVO JE OBRISANO, i to je to.
+Kada bi STVARNO BRISALI, morali bismo kaskadno da brisemo, i to je bas lose, pravi probleme.
+Zapravo i bitno je zbog data science.
+Bitno je i zbog dokaza da je nesto stvarno bilo tu!
+TLDR: ne brisi nikad
+
+-----
+
+Ja stavim @Entity tamo gde zelim da neka klasa ima TABELU u databazi
+Ali moram da imam i primary key. Da ne bih to stalno radio, napravicu '''BASE ENTITY''' i tamo napraviti @MappedSuperclass
+Ona je kao neka SUPERKLASA, koju ce da nasledjuju svi entitiji.
+ONA IMA ID
+TAJ ID IMA STRATEGIJE:
+    - Identity: INCREMENT, prati se u svakoj tabeli dokle smo stigli. Moram da sacuvam objekat da bi znao njegov id
+    nije dobro ovo koristiti ako iammo batch objekata, kada nemam da sacuvam jednog studenta, nego vise studenata odjednom.
+    On mora da insertuje pa dobijem id, insertujem da dobijem id.
+    NE KORISTIM ZA SKUPOVE
+    (sql, POSTgre)
+
+    - Sequence: Za skupove podataka, kao neki batch odjednom.
+    Nemaju sve baze support za ovo (samo Oracle, postGRE)
+    Definise se sekvenca brojeva, gde ja mogu da dam pocetni size, da ga definisem.
+    Ako ja kazem size=50, to znaci da ce se izgenerisati 50 kljuceva.
+    Kad iskoristi sve te brojeve od 1-50, onda generise sledece od 51-100, pa 101-150 ... generise po 50 id za koriscenje
+    (ne moram da insertujem pa cekam ID, nego su vec spremni ID, zapravo ovo je MNOGO BITNO)
+
+    - Table: nije los kad nemamo mogucnost za "SEQUENCE", a ne mogu da koristim IDENTITY, jer radim sa batchevima.
+    Ovde se u bazi bukvalno kreira za svaku tabelu, neki counter koji se prati.
+    Nije preterano efikasna
+    Ali jbg ako nemam sequence, i ovaj je dobar.
+
+    -Auto: pustim system da sam odredi koju strategiju je najbolju da koristim na osnovu modela koji koristim, drivera i ostalo
+
+    -UUid: kada imamo neki nasucmicno generisan string, ali po odredjenom formatu.
+    Kao imamo uuid verzija 1,2, 4, 6
+    Imamo nekoliko delova unutar tog stringa, i imamo taj neki potpuno nasumican niz, ova verzija uuid4
+    Nova verzija UUID sadrzi TIMESTASMP kad je kreiran neki ID, ovo je bas bitno zbog data science.
+    Taj timestamp je generisan u ID bas
+
+
+
+BITNO: strategije nasledjivanja:
+    - JOINED: ako napravim novu klasu, koja se zove PATIENT, i klasu DOKTOR, i klasu NURSE.
+        Sta je karakteristicno za njih?
+        Svi ce oni da naslede PERSON.
+        Sta ce da se desi sada kada imam JOINED nasledjivanje?
+        Kreirace se tabela, koja ce da se zove person_table, imace sve iz BaseEntitija (id i ostalo) imace sve iz Person (firstname, last, contact number),
+        I sad kreiram NURSE, ime namestim sve sve.
+        Ako nurse ima neke odvojene podatke, sve imace sada ID = 1, i njega vezemo za podatke iz person_table.
+        Morace sada da uradi JOIN, da veze NURSE i PERSON_TABLE, i onda cemo da dobijemo sve podatke koje treba da dobijemo,,
+        jeeer NURSE sadrzi podatke i iz NURE, i iz PERSON... zanimljivo
+
+        JOIN -> preskupa operacija
+        dobro je sto imamo person kao zascebnu tabelu, i onda ako mi j potrebno da radim sa svim userima login, dohvaticu sve person, i proveravacu da li je ok sifra i sve ostalo
+        Ako nemam to, onda moram da zovem pojedinacno za doktora, da vidim da li je to doktor, pa ako nije u doktorima, da vidimo dal i je u pacijentima,
+        pa ako nije u pacijentima onda vidi u sestrama... a ako nije ni tu, izbaci poruku da nije u sistemu!
+        E ali ovo je dobro ako imam nesto na FRONTU da mi pomogne, da kaze oke selectuj tip, kazi ja sam NURSE, i onda mogu mnogo brze da pretrazim !!! super FORA
+
+
+    - SINGLE TABLE
+        Ovaj koristi, najbolji
+        Kreira se jedna velika tabela, koja sadrzi  SVA POLJA IZ PERSON, SVA POLJA IZ NURSE, SVA POLJA IZ PATIENT, sve iz doktor
+        I ima jednu kolonu "DISKRIMINATOR TYPE"
+        To je kako da razlikujemo da li je neki red doktor, nurse, ili pacijent, ako tu stoji pacijent, onda je tu pacijent, ako je nurse onda nurs. (suepr fora)
+        Ako ja ne stavim diskriminator type, onda ce on da uzme naziv klase da bude diskriminator, kul, ali ja ne zelim da to bude, nego cu to naknadno raditi.
+        Primer:
+        ako stavim da je doktor u pitanju, tu ce biti svi podaci ono ID, pa sve iz person, i bice sve za doktora klasika, ali sve ostalo iz nurse ce isto biti tu, ali ce biti NULL !!!!!
+        To je jedino lose sto imam previse NULL vrednosti, pa nekad mora da se hendluje (ali cak i nije neophodno)
+        Performantnija od join
+
+
+    - TABLE PER CLASS:
+        Najlogicniji realno
+        Kreirace 3 tabele, doktor, pacijent, nurse
+        Svaka tabela ce imati sve sto treba da ima za sebe. Kul. Nista od tudjih.
+        Jedino lose je sto cemo iamti neke redudantne podatke.
+        LOSE JE STO NE MOZEMO DA DOHVATAMO PERSON !!!
+        osoba kao tabela ne postoji :(((
+
+Dodatno bitno:
+ - Ako imam bas puno razlicith klasa, razlicith medju sobom, nema bas smisla koristiti single table,
+   jer onda mi fazon imao 200 kolona, od kojih je za neku klasu, 190 kolona prazno (NULL)
+
+Problemi koje pazim:
+ako je JOINED: nemam diskriminator ni slucajno
+ako je SINGLE_TABLE: moram da imam diskriminator. Ali mi je ono "TABLE" zabranjeno, jer to je samo za rad sa TABLE_PER_CLASS:
+//@Table(name = "doctors")      NE MOZE OVO DA SE STAVI AKO IMAM SINGLE_TABLE !!! STRATEGIJA
+
+ne moze ID=aidentity --- ako imam TABLE_PER_CLASS, jer imamo 3 para tabela, kako generisati ID?
+------
+
+PAZI SNAKE_CASE i CamelCase !!!!
+U bazi je snake_case
+U javi je camelCase
+
+---------
+
+Dodam sam ovo u resourses/application.propreties:
+`spring.h2.console.enabled=true`
+ovo sam dodao da bi mogli sada da koristimo tu konzolu da vidimo jel sve ok
+dodao sam jos i:
+`spring.h2.console.path=/h2-console`
+`spring.datasource.url=jdbc:h2:mem:testdb`  --- jdbc, h2, memori baza, test db
+
+
+-------
+
+
+
+
+
+
+
+
+

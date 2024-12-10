@@ -10,10 +10,10 @@ import java.util.List;
 
 @Entity
 @DiscriminatorValue("PATIENT")
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Getter
-//@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Patient extends Person{
     private String medicalCode;
 
@@ -24,5 +24,10 @@ public class Patient extends Person{
             inverseJoinColumns = @JoinColumn(name="doctor_id")
     )
     private List<Doctor> doctors;
+
+    public Patient(String firstName, String lastName, String contactNumber, Address address, Status status, String medicalCode) {
+        super(firstName, lastName, contactNumber, address, status);
+        this.medicalCode = medicalCode;
+    }
 
 }

@@ -1,0 +1,113 @@
+client fronted app   ------(http)----->   nas servis   -------------  baza
+
+Kad imamo ovaj distribuiran sistem, koristi se JDBD
+
+meesage queue ce da ide izmedju nasih servisa, i bice neka HTTP komunikacija izmedju njih
+
+------
+
+flow:
+1) Klijent salje http zahtev. Hoce da dohvati npr sve pacijente. Salje "GET"
+    --- get, post, put/patch, delete
+Post je kad ubacujemo nesto unutra, ali mozemo i da ga koristimo kao UPDATE, znaci u sustini koristimo samo POST :DDD
+
+2) Taj get zahtev (method) saljem, na tu neku PUTANJU, na tu "rutu", na neki slash "ono /raf.rs,  tj /ispitni-rokovi GET
+U nekom headeru imamo da saljemo zahteve, JDBD Token u njemu
+8080/v1/kolokvijumske-nedelje GET
+
+- port 8080 je port na kome radi nas servis !!!!, a onda u nasem servisu trazimo putanje koje se metchuju sa "kolokvijumske-nedelje GET"
+- tu cemo da imamo razne JAVA METODE, koje ce se matchovati sa svakom putanjom, i tako razlikujemo sta nam treba, sta cemo da radimo
+  ona ce kao da preuzme taj zahtev, u fazonu, e neko te pozvao
+- ta metoda ce da poziva BIZNIS LOGIKU, koja ce iz BAZE da dohvati
+
+3) mi na nasem servisu treba da ponudimo koje sve on to stvari moze da uradi, kao neki njegov INTERFEJS,
+  - ja ti nudim npr da dohvatis /kolokvijumske-nedelje
+  - /ispitni-rokovi
+  - /raf-servisi
+  - /spiskovi
+  - /raspored
+
+FRONT ZA SVAKO DUGME VEZE AKCIJU
+/kolokvijumske-nedelje/naziv-nedelje
+sa fronta pozovem /kolokvijumske-nedelje/prva
+
+
+tu gde imamo te stvari koje nudimo - SE NALAZE U CONTROLLER-u, a on zove SERVIS
+On ce njega da pozove i kaze aj dohvati mi kolokvijumske nedelje
+
+Ovaj SERVIS ce da pozove bazu, a on poziva bazu preko REPOZITORIJA, i on ce da dohvata ovde kolokvijumske nedelje
+dohvatice kolovkijumske nedelje where name == prva, a on ce da vrati podatke.....
+ali nama se prikazuje odredjena STVAR, znaci kad dobijemo podatke iz baze, mi te podatke treba da PREPAKUJEMO
+kako?
+prepakujem preto tog MAPPERA u DTO, a DTO se vraca CONTROLLERU
+a on to vrati posle nazad onome koga je pitao
+
+
+a da bi ubacila STUD SLUZBA U OVO NESTO:
+ono moraju da zovu /kolokvijumske-nedelje/naziv-nedelje, ali kako znaju dal je POST/GET??
+
+pa, metoda mi se zove POST:
+i u zahtevu, moraju da daju BODY
+
+u BODY ---> su svi podaci koji su portebni da se napravi neki predmet u kolokvijumskoj nedelji
+u header saljemo neke META PODATKE !!!
+za GET, BODY ne postoji !!!
+
+BODY:
+{
+    "predmet":"LAAG (RI)",
+    "profesor":"milanka",
+    "Ucionice":[6,11,20,21],
+    "Vreme":["9-11", "11.30-13.30"]
+}
+
+Oni se salju u okviru zahteva, stignu, controller ce da kontaktira servis i kaze "DODAJ NOVI PREDMET U RASPORED", on doda, onda SERVIS komunicira sa REPOSITORY
+DTO sadrzi predmet, profesor, dan, sta god zelimo
+bitno je da se mapiraju nazivi polja, sa ovim sto je u JSON-u, ali obicno pravimo 1 na 1 da se poklapa
+
+
+-----
+
+po defaultu, ponasanje component je singleton, ali ako imamo BEAN, mi mozemo da stavimo neku nasu strategiju, kao npr PROTOTYPE
+
+-----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

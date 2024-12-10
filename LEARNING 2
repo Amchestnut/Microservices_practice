@@ -1,0 +1,137 @@
+- Servis za zakazivanje
+komunikacija sa serverom za usere
+Servis za usere ce imati komunikaciju sa notifikacija (kad se neko registruje u sistem, salje se imejl (potvrdite registraciju)
+servis za rezervacije ce takodje da salje neke notifikacije (uspesna rezervacija)
++++ dodatni mejl za podsetnik 24h pred termin
+
+-----
+
+@Embeddable
+Stavljamo na "ADRESU", jer hocemo nekako da je embedujemo (ukljucimo) u OSOBU
+@Embedded
+Stavljamo tamo gde koristimo ovu adresu (u person)
+
+@Enumerated
+Za enume, ali necemo ordinal brojeve, nego ocemo stringove, pa pisemo:
+    @Enumerated(value=EnumType.STRING)
+
+-------
+
+ARHITEKTURA:
+Ovde bi trebalo da se naprave 2 servisa:
+    - zaposleni
+    - pacijenti
+
+jer oni imaju dosta razlicitih stvari, i nisu mnogo povezani jedan sa drugim
+
+---------
+
+MANY-TO-ONE relationship
+ONE-TO-MANY
+doktor moze imati vise pacijenata
+pacijent moze imati vise doktora
+
+PatientHasDoctor - medjutabela izmedju tih 2 tabele
+Mora da uzme primarne kljuceve iz PATIENT && DOCTOR
+
+!!!!!!!!!!!!!!!! GLAVNO: ManyToOne: many instancies of the current ENTITY: APPOINTMENT are associated with ONE PATIENT !!!!!!!!!!!!!!!
+
+ako imam listu, npr tamo List<Patient> patients, moram da:
+    1) na jednom mestu definisem @JoinTable i parametre, tipa ime,
+        a) po kojoj koloni se joinuje
+        b) inverznu kolonu
+        u sustini, ova 2 cine kompozitni kljuc
+    2) na drugom mestu gde stavljam many to many, treba da stavim "mappedBy" da bi videli sa kim se namapira. Tu napisem bas tacan naziv "doctors" koji ima ona lista tamo.
+
+
+----------------------
+
+
+Sve ovo sto smo dosad radili, je sloj MODELA, tu definisemo sve nase modele i tu se kreira SEMA BAZE, i na osnovu onih @anotacija se sve kreira. To se sve radi automatski
+"Domain"
+p.s. uvek koristi java.sql DATE
+
+
+--------------------
+
+Repository:
+
+Sloj REPOSITORY omogucava direktnu komunikaciju sa bazom, u servisima cu da pravim biznis logiku
+"hocu da mi dodas novog pacijenta"...
+on prosledi podatke za kreiranje...
+i onda ja u servisu upakujem to kako treba,
+i onda kazem: bazo, sacuvaj ovog pacijenta !!!!!
+
+Taj save koji zovem, to je iz repozitorijum sloja, ali repozitorijum je zamaskiran tako da on u pozadini sprovodi UPITE NAD BAZOM,   DIREKTNO
+Tako da ja kad kazem "SAVE", ne moram ja da pravim upite i ostalo. iza tog save stoji cela logika kako se cuva u bazu
+
+Za kompozitini kljuc, imam neki @EmbeddedID, ili tako nesto, i tako kreiram kompozitni kljuc, proveriti...
+
+---------
+
+INDEX
+Ae recimo treba nam brzo pretrazivanje za APPOINTMENT. Trebaju nam indeksi za to.
+Oni koriste STRUKTURU ALGORITMA:
+ - B stabla
+ - B+ stabla
+
+
+--------
+
+Repository koji pravimo, pravimo kao package, i u njega smestamo sve kako mozemo da komuniciramo sa bazom, ZA SVAKI ENTITET
+Ako hocu nesto da ubacim u tabelu, ja moram da joj pristupim
+
+---------
+
+
+GET
+POST
+PUT / PATCH     // put -> sve se azurira,   patch -> samo neka polja se azuriraju
+DELETE
+
+-----
+
+Vise nemam onaj SELECT * FROM DOCTORS, nego sada imam bukvalno u interfejsu metodu:
+    findAll()
+
+Paginacija je da ako hocu da imam na stranici 10 doktora, a ja imam ukupno 1000 doktora, pa necu svih 1000 da prikazem...
+nego imam 3 stranice po 10 doktora, i ja ih na GUI prikazem kao 30 stranica
+
+findAllByID() - CRUD operacija
+takodje imam ono "save()" u CRUD... bas kul, ovaj reposirory
+
+
+-----
+
+@COMPONENT je izgleda nadklasa svima
+@Servis, @Repository,
+ali glupo je da stavim negde repositoyry ako je to servis, ovo je klasicna name konvencija.
+
+Component je za neke objekte koji "ne rade sa bazom"?
+
+Moze da se koristi i BEAN:
+Component, repository, servis, sve je to zapravo: BEAN
+sve sto pravimo, a oznacimo sa BEAN, je nesto sa cime ce BEAN da brine, ne brinem o inicijalizaciji tih objekata, kad ce da se kreiraju i koriste...
+
+Ono sto definisem sa BEAN, on ce da napravi kao instancu toga (tokom skeniranja), i to ce da se smesti u taj neki KONTEJNER (inversion of control)
+
+BEAN u sustini sluzi za "nas", da napravi te neke instance i to, a ostali sluze za rad sa bazom
+Kad imam BEAN, kad ocu da je oznacim sa BEAN, ona mora da ima anotaciju: @Configuration
+
+
+------
+
+U distribuiranim sistemima, kljuc bi trebao da bude UUID (uniquie string), a ne LONG, jer ne mogu svi da znaju sta se desava u vise servisa, pa imamo ovaj UUID
+On je formiran po odredjenom formatu, ono UUID4 i UUID6
+
+
+
+
+
+
+
+
+
+
+
+
