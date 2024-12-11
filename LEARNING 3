@@ -72,15 +72,33 @@ po defaultu, ponasanje component je singleton, ali ako imamo BEAN, mi mozemo da 
 
 -----
 
+@GetMapping
+ovo sto sam napravio za pacient putanju, GET MAPPING  --> putanja: http://localhost:8080/patient
 
+nmg da imam 2 ista getmappinga
 
+takodje, mogu da imam:
+ - PATH VARIJABLU:  @GetMapping("/{medicalCode}")
+?medicalCode=12345  ---> request PARAM
+?medicalCode=12345&&firstName="andrija"  ---> request PARAM sa vise args
 
+-----------
 
+// PATH varijabla
+    // ?medicalCode=12345  ---> request PARAM
+    @GetMapping("/{medicalCode}")   // ne smem da imam 2 ista getmappinga, jelte, moram imati neku drugu putanju.  Ova putanja se lepi na ORIGINALNU, http://localhost:8080/patient + ovo
+    public ResponseEntity<PatientDTO> getPatient(@PathVariable("medicalCode") String medicalCode){
+        return new ResponseEntity<>(patientService.findByMedicalCode(medicalCode), HttpStatus.OK);
+    }
 
+// A ZASTO JE DTO?
+    // zato sto ne moze da ti prosledi ID pri kreiranju ;)))))
+    @PostMapping
+    public ResponseEntity<PatientDTO> getPatient(@RequestBody PatientCreateDTO patientCreateDTO){   // drugaciji DTO jer za njega treba i adresa npr, status
+        return new ResponseEntity<>(patientService.findByMedicalCode(medicalCode), HttpStatus.OK);
+    }
 
-
-
-
+---------
 
 
 

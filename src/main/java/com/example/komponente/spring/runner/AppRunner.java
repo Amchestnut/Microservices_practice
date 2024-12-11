@@ -32,7 +32,7 @@ public class AppRunner {
             patientRepository.save(patient);
 
             // medical code je isti, ali bi generalno trebao da stoji neki UNIQUE CONSTRAINT koji bi ovo zabranio
-            Patient patient2 = new Patient("Pera23", "Peric123", "1111", address, Status.ACTIVE, "1235");
+            Patient patient2 = new Patient("Pera23", "Peric123", "1111", address, Status.ACTIVE, "123456");
             patientRepository.save(patient2);
 
         };
